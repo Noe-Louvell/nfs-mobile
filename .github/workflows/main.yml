@@ -32,4 +32,4 @@ jobs:
       - name: Deploy the apk on the server 
         run: rsync -avz ./android/app/build/outputs/apk/release/app-release.apk ${{ secrets.SSH_USER }}@${{ secrets.HOST }}:~/mobile/apk-nfs-mobile
       - name: Rename Directory apk-nfs-mobile for versioning
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/mobile/apk-nfs-mobile ~/web/apk-nfs-mobile_$(date +%Y-%m-%d:%H-%M-%S)'
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/mobile/apk-nfs-mobile ~/mobile/apk-nfs-mobile_$(date +%Y-%m-%d:%H-%M-%S)'
