@@ -1,8 +1,8 @@
-name: CI
+name: CI-CD nfs-mobile
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ master, dev ]
 jobs:
   build-react-native:
     runs-on: ubuntu-latest
@@ -23,16 +23,18 @@ jobs:
 
       - name: Build APK 
         run: cd android && chmod +x gradlew && ./gradlew assembleRelease
-
+        # Partie déploiment UNIQUEMENT ANDROID SSH
       - name: Installation ssh
         uses: shimataro/ssh-key-action@v2
         with:
+          # Secret Key a renseigné dans les secrets GITHUB
           key: ${{ secrets.SSH_KEY }}
           known_hosts: 'random-string-text'
 
       - name: Add Known Hosts
         run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
+      # User et Host a renseigné dans les secrets GITHUB 
+      # Exemple: ssh noel@xx.xxx.xx.xxx mkdir -p ./mobile/apk-nfs-mobile
       - name: Create Directory apk-nfs-mobile
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} mkdir -p ./mobile/apk-nfs-mobile
 
@@ -41,3 +43,4 @@ jobs:
       
       - name: Rename Directory apk-nfs-mobile for versioning
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/mobile/apk-nfs-mobile ~/mobile/apk-nfs-mobile_$(date +%Y-%m-%d:%H-%M-%S)'
+        #Exemple de résulat : /mobile/apk-nfs-mobile_2022-10-16:13-36-07
