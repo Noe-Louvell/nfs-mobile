@@ -18,5 +18,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Artefact 
+      - name: Build APK 
         run: cd android && chmod +x gradlew && ./gradlew assembleRelease
+              - name: Installation ssh
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: 'random-string-text'
+      - name: Add Known Hosts
+        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Create Directory apk-nfs-mobile
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} mkdir -p ./mobile/apk-nfs-mobile
+      - name: Deploy the apk on the server 
+        run: rsync -avz ./android/app/build/outputs/apk/release/app-release.apk ${{ secrets.SSH_USER }}@${{ secrets.HOST }}:~/mobile/apk-nfs-mobile
+      - name: Rename Directory apk-nfs-mobile for versioning
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/mobile/apk-nfs-mobile ~/web/apk-nfs-mobile_$(date +%Y-%m-%d:%H-%M-%S)'
